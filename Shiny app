@@ -1,0 +1,298 @@
+data <- read.csv('train.csv')
+data
+
+lotArea <- data$LotArea
+yrsOld <- data$YrSold
+overallQual <- data$OverallQual
+yearBuilt <- data$YearBuilt
+salePrice <- data$SalePrice
+
+library(ggplot2)
+ui <- fluidPage(
+  
+  fluidRow(
+    column(width = 5,selectInput("plotType", "Select Plot Type:",
+              choices = c("Scatter Plot","Line Plot",
+                           "Box Plot", "Pie Chart", "FreqPoly"),
+              selected = "Scatter Plot")),
+  
+    column(width = 5,radioButtons(inputId = "plotType2",
+               label = "Select Plot Type:",
+               choices = c("Histogram Plot", "Density Plot", "Bar Plot",
+                           "Jitter Plot","Violin Plot"),
+               selected = "Histogram Plot"))),
+  
+  selectInput("variable", "Select varaible :",
+              choices = c("Lot Area", "YrsOld", "OverallQual","YearBuilt", "SalePrice"),
+              selected = "Lot Area"),
+  
+  
+  mainPanel(
+    
+    fluidRow(
+      column(width = 10, plotOutput(outputId = "selectedPlot")),
+      column(width = 10, plotOutput(outputId = "selectedPlot2"))
+    )
+  ))
+
+server <- function(input, output) {
+  
+  output$selectedPlot <- renderPlot({
+    
+    plotType <- input$plotType
+    yVariable <- input$variable
+    
+    if (plotType == "Scatter Plot") {
+      switch(yVariable,
+      "Lot Area" = {
+      ggplot(data, aes_string(x = data$Id, y = lotArea)) +
+        geom_point() +
+        labs(title = paste("Scatter Plot of data vs.", lotArea),
+             x = "Id", y = lotArea)
+      },
+      "YrsOld" = {
+        ggplot(data, aes_string(x = data$Id, y = yrsOld)) +
+          geom_point() +
+          labs(title = paste("Scatter Plot of data vs.", yrsOld),
+               x = "Id", y = yrsOld)
+      },
+      "OverallQual" = {
+        ggplot(data, aes_string(x = data$Id, y = overallQual)) +
+          geom_point() +
+          labs(title = paste("Scatter Plot of data vs.", overallQual),
+               x = "Id", y = overallQual)
+      },
+      "YearBuilt" = {
+        ggplot(data, aes_string(x = data$Id, y = yearBuilt)) +
+          geom_point() +
+          labs(title = paste("Scatter Plot of data vs.", yearBuilt),
+               x = "Id", y = yearBuilt)
+      },
+      "SalePrice" = {
+        ggplot(data, aes_string(x = data$Id, y = salePrice)) +
+          geom_point() +
+          labs(title = paste("Scatter Plot of data vs.", salePrice),
+               x = "Id", y = salePrice)
+      }
+    )
+      
+    }
+    
+    
+    else if (plotType == "Line Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(x = Id, y = lotArea)) + 
+                 geom_line()+ labs(x="Ids", y="LotArea",title = "Line Plot")
+             },
+             "YrsOld" = {
+               ggplot(data, aes(x = Id, y = yrsOld)) + 
+                 geom_line()+ labs(x="Ids", y="YrsOld",title = "Line Plot")
+             },
+             "OverallQual" = {
+               ggplot(data, aes(x = Id, y = overallQual)) + 
+                 geom_line()+ labs(x="Ids", y="OverallQual",title = "Line Plot")
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(x = Id, y = yearBuilt)) + 
+                 geom_line()+ labs(x="Ids", y="YearBuilt",title = "Line Plot")
+             },
+             "SalePrice" = {
+               ggplot(data, aes(x = Id, y = salePrice)) + 
+                 geom_line()+ labs(x="Ids", y="SalePrice",title = "Line Plot")
+             }
+      )
+    }
+    
+    else if (plotType == "Box Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               boxplot(lotArea)
+             },
+             "YrsOld" = {
+               boxplot(yrsOld)
+             },
+             "OverallQual" = {
+               boxplot(overallQual)
+             },
+             "YearBuilt" = {
+               boxplot(yearBuilt)
+             },
+             "SalePrice" = {
+               boxplot(salePrice)
+             }
+      )
+    }
+    
+    
+    else if (plotType == "Pie Chart") {
+               pie(data$PoolArea, labels = data$HouseStyle, main = "Pie Chart")
+    }
+    
+    else if (plotType == "FreqPoly") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(lotArea)) + 
+                 geom_freqpoly(binwidth=5, color="red")
+             },
+             "YrsOld" = {
+               ggplot(data, aes(yrsOld)) + 
+                 geom_freqpoly(binwidth=5, color="green")
+             },
+             "OverallQual" = {
+               ggplot(data, aes(overallQual)) + 
+                 geom_freqpoly(binwidth=5, color="black")
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(yearBuilt)) + 
+                 geom_freqpoly(binwidth=5, color="yellow")
+             },
+             "SalePrice" = {
+               ggplot(data, aes(salePrice)) + 
+                 geom_freqpoly(binwidth=5, color="orange")
+             }
+      )
+    }
+    
+  
+  })
+  
+  output$selectedPlot2 <- renderPlot({
+    plotType <- input$plotType2
+    yVariable <- input$variable
+    
+    if( plotType == "Histogram Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(x = Id, fill = "LotArea")) + 
+                 geom_histogram(binwidth = 10)+ labs(x="Ids", y="LotArea",title = "Histogram Plot")
+             },
+             "YrsOld" = {
+               ggplot(data, aes(x = Id, fill = "YrsOld")) + 
+                 geom_histogram(binwidth = 10)+ labs(x="Ids", y="YrsOld",title = "Histogram Plot")
+             },
+             "OverallQual" = {
+               ggplot(data, aes(x = Id, fill = "OverallQual")) + 
+                 geom_histogram(binwidth = 10)+ labs(x="Ids", y="OverallQual",title = "Histogram Plot")
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(x = Id, fill = "YearBuilt")) + 
+                 geom_histogram(binwidth = 10)+ labs(x="Ids", y="YearBuilt",title = "Histogram Plot")
+             },
+             "SalePrice" = {
+               ggplot(data, aes(x = Id, fill = "SalePrice")) + 
+                 geom_histogram(binwidth = 10)+ labs(x="Ids", y="SalePrice",title = "Histogram Plot")
+             }
+      )
+    }
+    
+    else if (plotType == "Density Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(x = Id, fill = "LotArea")) + 
+                 geom_density()+ labs(x="Ids", y="LotArea",title = "Density Plot")
+             },
+             "YrsOld" = {
+               ggplot(data, aes(x = Id, fill = "yrsOld")) + 
+                 geom_density()+ labs(x="Ids", y="YrsOld",title = "Density Plot")
+             },
+             "OverallQual" = {
+               ggplot(data, aes(x = Id, fill = "overallQual")) + 
+                 geom_density()+ labs(x="Ids", y="OverallQual",title = "Density Plot")
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(x = Id, fill = "yearBuilt")) + 
+                 geom_density()+ labs(x="Ids", y="YearBuilt",title = "Density Plot")
+             },
+             "SalePrice" = {
+               ggplot(data, aes(x = Id, fill = "salePrice")) + 
+                 geom_density()+ labs(x="Ids", y="SalePrice",title = "Density Plot")
+             }
+      )
+    }
+    
+    else if( plotType == "Bar Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(x = Id, y = lotArea)) + 
+                 geom_bar(stat = "identity")+ labs(x="Ids", y="LotArea",title = "Bar Plot")
+             },
+             "YrsOld" = {
+               ggplot(data, aes(x = Id, y = yrsOld)) + 
+                 geom_bar(stat = "identity")+ labs(x="Ids", y="YrsOld",title = "Bar Plot")
+             },
+             "OverallQual" = {
+               ggplot(data, aes(x = Id, y = overallQual)) + 
+                 geom_bar(stat = "identity")+ labs(x="Ids", y="OverallQual",title = "Bar Plot")
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(x = Id, y = yearBuilt)) + 
+                 geom_bar(stat = "identity")+ labs(x="Ids", y="YearBuilt",title = "Bar Plot")
+             },
+             "SalePrice" = {
+               ggplot(data, aes(x = Id, y = salePrice)) + 
+                 geom_bar(stat = "identity")+ labs(x="Ids", y="SalePrice",title = "Bar Plot")
+             }
+      )
+    }
+    
+    
+    
+    else if (plotType == "Jitter Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(Id, lotArea, color=lotArea)) + 
+                 geom_jitter()
+             },
+             "YrsOld" = {
+               ggplot(data, aes(Id, yrsOld, color=yrsOld)) + 
+                 geom_jitter()
+             },
+             "OverallQual" = {
+               ggplot(data, aes(Id, overallQual, color=overallQual)) + 
+                 geom_jitter()
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(Id, yearBuilt, color=yearBuilt)) + 
+                 geom_jitter()
+             },
+             "SalePrice" = {
+               ggplot(data, aes(Id, salePrice, color=salePrice)) + 
+                 geom_jitter()
+             }
+      )
+    }
+    
+    else if (plotType == "Violin Plot") {
+      switch(yVariable,
+             "Lot Area" = {
+               ggplot(data, aes(Id, lotArea)) + 
+                 geom_violin()
+             },
+             "YrsOld" = {
+               ggplot(data, aes(Id, yrsOld)) + 
+                 geom_violin()
+             },
+             "OverallQual" = {
+               ggplot(data, aes(Id, overallQual)) + 
+                 geom_violin()
+             },
+             "YearBuilt" = {
+               ggplot(data, aes(Id, yearBuilt)) + 
+                 geom_violin()
+             },
+             "SalePrice" = {
+               ggplot(data, aes(Id, salePrice)) + 
+                 geom_violin()
+             }
+      )
+    }
+    
+   
+    
+    
+    
+  })
+}
+
+shinyApp(ui, server)
